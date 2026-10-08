@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Monitor — Odem Browser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================================
+       DESIGN SYSTEM
+    ========================================================= */
+        
+         :root {
+            --bg-base: #070b14;
+            --bg-deep: #050811;
+            --bg-surface: #0c1220;
+            --bg-card: rgba(15, 23, 42, 0.72);
+            --bg-card-hover: rgba(20, 30, 52, 0.86);
+            --border: rgba(148, 163, 184, 0.10);
+            --border-light: rgba(148, 163, 184, 0.16);
+            --border-accent: rgba(59, 130, 246, 0.40);
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --primary-dark: #2563eb;
+            --primary-dim: rgba(59, 130, 246, 0.12);
+            --purple: #8b5cf6;
+            --purple-dim: rgba(139, 92, 246, 0.12);
+            --success: #22c55e;
+            --success-light: #4ade80;
+            --success-dim: rgba(34, 197, 94, 0.10);
+            --warning: #f59e0b;
+            --warning-dim: rgba(245, 158, 11, 0.10);
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-sub: #cbd5e1;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --glass-blur: blur(20px);
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.18);
+            --shadow-hover: 0 18px 45px rgba(0, 0, 0, 0.38), 0 4px 12px rgba(0, 0, 0, 0.20);
+        }
+        /* =========================================================
+       RESET
+    ========================================================= */
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: radial-gradient( circle at 10% 0%, rgba(59, 130, 246, 0.13), transparent 32%), radial-gradient( circle at 90% 15%, rgba(139, 92, 246, 0.10), transparent 28%), radial-gradient( circle at 50% 100%, rgba(37, 99, 235, 0.07), transparent 35%), var(--bg-base);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* =========================================================
+       SCROLLBAR
+    ========================================================= */
+        
+         ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: var(--bg-deep);
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: linear-gradient( 180deg, #334155, #1e293b);
+            border-radius: 20px;
+        }
+        
+         ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        /* =========================================================
+       LAYOUT
+    ========================================================= */
+        
+        .container {
+            width: 100%;
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 42px 32px 50px;
+        }
+        /* =========================================================
+       HEADER
+    ========================================================= */
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 34px;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: linear-gradient( 135deg, var(--primary), var(--purple));
+            color: white;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .brand-icon::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            top: -35px;
+            right: -25px;
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(35deg);
+        }
+        
+        .header h1 {
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            background: linear-gradient( 135deg, #ffffff 10%, #cbd5e1 65%, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        /* =========================================================
+       STATUS
+    ========================================================= */
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 15px;
+            background: linear-gradient( 135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: var(--success-light);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.06);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.08), 0 0 12px rgba(34, 197, 94, 0.65);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.55;
+                transform: scale(0.85);
+            }
+        }
+        /* =========================================================
+       STATISTICS
+    ========================================================= */
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat( auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            position: relative;
+            background: linear-gradient( 145deg, rgba(15, 23, 42, 0.82), rgba(10, 16, 29, 0.72));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 2px;
+            background: linear-gradient( 90deg, var(--primary), var(--purple));
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            right: -60px;
+            bottom: -70px;
+            background: radial-gradient( circle, rgba(59, 130, 246, 0.10), transparent 70%);
+            pointer-events: none;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            border-radius: 11px;
+            background: linear-gradient( 135deg, rgba(59, 130, 246, 0.16), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(59, 130, 246, 0.20);
+            color: var(--primary-light);
+            font-size: 16px;
+        }
+        
+        .stat-title {
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 9px;
+        }
+        
+        .stat-value {
+            font-size: 31px;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            color: var(--text-main);
+            line-height: 1;
+        }
+        
+        .stat-value.small {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0;
+            color: var(--text-sub);
+            word-break: break-all;
+            line-height: 1.5;
+        }
+        /* =========================================================
+       TABLE CARD
+    ========================================================= */
+        
+        .table-card {
+            background: linear-gradient( 145deg, rgba(15, 23, 42, 0.82), rgba(8, 13, 24, 0.80));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--shadow-card);
+        }
+        /* =========================================================
+       TABLE HEADER
+    ========================================================= */
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 25px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient( 180deg, rgba(255, 255, 255, 0.025), transparent);
+            gap: 20px;
+        }
+        
+        .table-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .table-title-icon {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: var(--primary-dim);
+            border: 1px solid var(--border-accent);
+            color: var(--primary-light);
+        }
+        
+        .table-title h2 {
+            font-size: 17px;
+            font-weight: 750;
+            color: var(--text-main);
+            letter-spacing: -0.015em;
+        }
+        
+        .table-title p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        /* =========================================================
+       REFRESH BUTTON
+    ========================================================= */
+        
+        .refresh-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            background: linear-gradient( 135deg, rgba(59, 130, 246, 0.16), rgba(59, 130, 246, 0.07));
+            color: #93c5fd;
+            padding: 10px 17px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .refresh-button:hover {
+            background: linear-gradient( 135deg, rgba(59, 130, 246, 0.28), rgba(59, 130, 246, 0.12));
+            border-color: rgba(59, 130, 246, 0.65);
+            color: #dbeafe;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.12);
+        }
+        
+        .refresh-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+        /* =========================================================
+       TABLE
+    ========================================================= */
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+        
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        
+        th {
+            text-align: left;
+            background: rgba(5, 10, 19, 0.92);
+            color: var(--text-muted);
+            font-size: 10.5px;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 15px 20px;
+            font-size: 13px;
+            color: var(--text-sub);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.055);
+            transition: background 0.18s ease, color 0.18s ease;
+        }
+        
+        tbody tr {
+            transition: background 0.18s ease;
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tbody tr:hover {
+            background: rgba(59, 130, 246, 0.045);
+        }
+        
+        tbody tr:hover td {
+            color: var(--text-main);
+        }
+        /* =========================================================
+       IP BADGE
+    ========================================================= */
+        
+        .ip-badge {
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--mono);
+            font-size: 11.5px;
+            padding: 5px 9px;
+            background: rgba(59, 130, 246, 0.09);
+            border: 1px solid rgba(59, 130, 246, 0.22);
+            border-radius: 7px;
+            color: #93c5fd;
+            white-space: nowrap;
+        }
+        /* =========================================================
+       MAC BADGE
+    ========================================================= */
+        
+        .mac-badge {
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--mono);
+            font-size: 10.5px;
+            padding: 5px 8px;
+            background: rgba(139, 92, 246, 0.09);
+            border: 1px solid rgba(139, 92, 246, 0.22);
+            border-radius: 7px;
+            color: #c4b5fd;
+            white-space: nowrap;
+        }
+        /* =========================================================
+       URL
+    ========================================================= */
+        
+        .url-link {
+            display: block;
+            max-width: 380px;
+            color: #60a5fa;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12.5px;
+            transition: color 0.15s ease;
+        }
+        
+        .url-link:hover {
+            color: #bfdbfe;
+            text-decoration: underline;
+        }
+        /* =========================================================
+       NETWORK BADGE
+    ========================================================= */
+        
+        .net-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            padding: 5px 9px;
+            background: var(--success-dim);
+            border: 1px solid rgba(34, 197, 94, 0.20);
+            border-radius: 7px;
+            color: #86efac;
+        }
+        /* =========================================================
+       WIFI
+    ========================================================= */
+        
+        .wifi-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            padding: 5px 9px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.18);
+            border-radius: 7px;
+            color: #86efac;
+        }
+        
+        .wifi-inline {
+            display: block;
+            max-width: 220px;
+            font-size: 11.5px;
+            color: var(--text-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .wifi-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        /* =========================================================
+       TIMESTAMP
+    ========================================================= */
+        
+        .ts {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+        
+        .empty {
+            text-align: center;
+            padding: 75px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            border-radius: 18px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            font-size: 27px;
+        }
+        
+        .empty p {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        /* =========================================================
+       FOOTER
+    ========================================================= */
+        
+        .footer {
+            margin-top: 25px;
+            color: var(--text-dim);
+            font-size: 11.5px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .footer::before,
+        .footer::after {
+            content: '';
+            width: 35px;
+            height: 1px;
+            background: linear-gradient( 90deg, transparent, rgba(148, 163, 184, 0.15));
+        }
+        
+        .footer::after {
+            transform: rotate(180deg);
+        }
+        /* =========================================================
+       LOADING ANIMATION
+    ========================================================= */
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .loading .refresh-button {
+            cursor: wait;
+        }
+        /* =========================================================
+       RESPONSIVE — TABLET
+    ========================================================= */
+        
+        @media (max-width: 900px) {
+            .container {
+                padding: 30px 22px 40px;
+            }
+            .header {
+                align-items: flex-start;
+            }
+            .statistics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .table-header {
+                align-items: flex-start;
+            }
+        }
+        /* =========================================================
+       RESPONSIVE — MOBILE
+    ========================================================= */
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 22px 14px 35px;
+            }
+            .header {
+                flex-direction: column;
+                margin-bottom: 25px;
+                gap: 15px;
+            }
+            .header h1 {
+                font-size: 23px;
+            }
+            .header p {
+                font-size: 12px;
+            }
+            .brand-icon {
+                width: 43px;
+                height: 43px;
+                border-radius: 12px;
+            }
+            .status-badge {
+                align-self: flex-start;
+            }
+            .statistics {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            .stat-card {
+                padding: 18px;
+            }
+            .stat-value {
+                font-size: 27px;
+            }
+            .table-card {
+                border-radius: 15px;
+            }
+            .table-header {
+                padding: 18px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .refresh-button {
+                width: 100%;
+            }
+            th,
+            td {
+                padding: 13px 15px;
+            }
+            .url-link {
+                max-width: 250px;
+            }
+        }
+        /* =========================================================
+       REDUCED MOTION
+    ========================================================= */
+        
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <div class="header-brand">
+                    <div class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="2" y1="12" x2="22" y2="12" />
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                            </svg>
+                    </div>
+                    <h1>Navigation Monitor</h1>
+                </div>
+                <p>Suivi des activités enregistrées par Odem Browser</p>
+            </div>
+            <div class="status-badge"><span class="status-dot"></span> Mise à jour en direct</div>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="statistics">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-title">Total navigations</div>
+                <div class="stat-value" id="total">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🌐</div>
+                <div class="stat-title">IP uniques</div>
+                <div class="stat-value" id="unique-ip">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🕐</div>
+                <div class="stat-title">Dernière activité</div>
+                <div class="stat-value small" id="last-update">--</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🔗</div>
+                <div class="stat-title">URL actuelle</div>
+                <div class="stat-value small" id="current-url">--</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📡</div>
+                <div class="stat-title">Réseau actuel</div>
+                <div class="stat-value small" id="network-name">--</div>
+            </div>
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">
+                    <h2>Historique de navigation</h2>
+                    <p>Les dernières activités enregistrées en temps réel</p>
+                </div>
+                <button class="refresh-button" onclick="getNavigationData()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    Actualiser
+                </button>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Adresse IP</th>
+                            <th>Adresse MAC</th>
+                            <th>URL visitée</th>
+                            <th>Réseau</th>
+                            <th>Wi‑Fi</th>
+                            <th>Date & Heure</th>
+                        </tr>
+                    </thead>
+                    <tbody id="navigation-data"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>⏱</span> Actualisation automatique toutes les 2 secondes
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8001/navigation-data";
+
+        async function getNavigationData() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                const data = await response.json();
+                updateStatistics(data);
+                updateTable(data);
+            } catch (error) {
+                console.error("Erreur :", error);
+            }
+        }
+
+        function updateStatistics(data) {
+            document.getElementById("total").textContent = data.length;
+            const uniqueIPs = new Set(data.map(item => item.ip_address));
+            document.getElementById("unique-ip").textContent = uniqueIPs.size;
+
+            if (data.length > 0) {
+                const last = data[data.length - 1];
+                const date = new Date(last.timestamp);
+                document.getElementById("last-update").textContent = date.toLocaleString("fr-FR");
+
+                const currentUrlEl = document.getElementById("current-url");
+                currentUrlEl.textContent = last.url || "";
+                currentUrlEl.title = last.url || "";
+
+                const networkNameEl = document.getElementById("network-name");
+                const networkValue = last.network_name && last.network_name !== "Inconnu" ? last.network_name : "";
+                networkNameEl.textContent = networkValue;
+                networkNameEl.title = networkValue;
+            } else {
+                document.getElementById("current-url").textContent = "";
+                document.getElementById("current-url").title = "";
+                document.getElementById("network-name").textContent = "";
+                document.getElementById("network-name").title = "";
+            }
+        }
+
+        function updateTable(data) {
+            const table = document.getElementById("navigation-data");
+            table.innerHTML = "";
+            if (!data || data.length === 0) {
+                table.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty">
+                                <span class="empty-icon">🔍</span>
+                                <p>Aucune donnée de navigation disponible.</p>
+                            </td>
+                        </tr>
+                    `;
+                return;
+            }
+
+            const sortedData = [...data].reverse();
+            sortedData.forEach(item => {
+                const row = document.createElement("tr");
+                const date = new Date(item.timestamp);
+
+                const ssid = item.wifi_ssid && item.wifi_ssid !== "null" ? item.wifi_ssid : "";
+                const password = item.wifi_password && item.wifi_password !== "null" ? item.wifi_password : "";
+
+                let wifiHtml = "";
+                if (ssid || password) {
+                    wifiHtml = `<div class="wifi-list">`;
+                    if (ssid) wifiHtml += `<span class="wifi-badge">📶 ${ssid}</span>`;
+                    if (password) wifiHtml += `<span class="wifi-inline">${password}</span>`;
+                    wifiHtml += `</div>`;
+                }
+
+                const networkValue = item.network_name && item.network_name !== "Inconnu" ? item.network_name : "";
+
+                row.innerHTML = `
+                        <td><span class="ip-badge">${item.ip_address}</span></td>
+                        <td><span class="mac-badge">${item.mac_address}</span></td>
+                        <td><a href="${item.url}" target="_blank" class="url-link" title="${item.url}">${item.url}</a></td>
+                        <td><span class="net-badge">${networkValue ? '📡 ' + networkValue : ''}</span></td>
+                        <td>${wifiHtml}</td>
+                        <td><span class="ts">${date.toLocaleString("fr-FR")}</span></td>
+                    `;
+
+                table.appendChild(row);
+            });
+        }
+
+        // Initial fetch + auto-refresh
+        getNavigationData();
+        setInterval(getNavigationData, 2000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Odem Browser - Accueil</title>
+    <style>
+         :root {
+            --bg-base: #f3f5f7;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: rgba(255, 255, 255, 1);
+            --bg-input: #ffffff;
+            --border-subtle: rgba(32, 33, 36, 0.12);
+            --border-hover: rgba(26, 115, 232, 0.35);
+            --primary: #1a73e8;
+            --primary-gradient: linear-gradient(135deg, #4285f4 0%, #34a853 33%, #fbbc05 66%, #ea4335 100%);
+            --text-main: #202124;
+            --text-secondary: #5f6368;
+            --text-muted: #5f6368;
+            --accent-glow: rgba(26, 115, 232, 0.12);
+            --card-shadow: 0 8px 24px rgba(32, 33, 36, 0.08);
+            --glass-blur: blur(8px);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 28px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .site-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2px;
+            font-size: clamp(52px, 7vw, 104px);
+            font-weight: 500;
+            letter-spacing: -0.07em;
+            line-height: 1;
+            margin-bottom: 28px;
+            user-select: none;
+        }
+        
+        .site-title span {
+            display: inline-block;
+        }
+        
+        .blue {
+            color: #4285f4;
+        }
+        
+        .red {
+            color: #ea4335;
+        }
+        
+        .yellow {
+            color: #fbbc05;
+        }
+        
+        .green {
+            color: #34a853;
+        }
+        
+        .search-container {
+            width: min(720px, 100%);
+            margin-bottom: 36px;
+        }
+        
+        .search-box-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(32, 33, 36, 0.12);
+            border-radius: 28px;
+            padding: 8px 12px 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.12);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            height: 58px;
+        }
+        
+        .search-box-card:focus-within {
+            border-color: rgba(26, 115, 232, 0.45);
+            box-shadow: 0 1px 8px rgba(26, 115, 232, 0.14);
+            transform: translateY(-1px);
+        }
+        
+        .search-icon-wrap {
+            color: #9aa0a6;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            transition: color 0.2s;
+        }
+        
+        .search-box-card:focus-within .search-icon-wrap {
+            color: var(--primary);
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-main);
+            outline: none;
+            min-width: 0;
+            line-height: 1.5;
+            caret-color: var(--primary);
+        }
+        
+        .search-input::placeholder {
+            color: #5f6368;
+            font-weight: 400;
+        }
+        
+        .clear-btn {
+            background: rgba(32, 33, 36, 0.04);
+            border: 1px solid rgba(32, 33, 36, 0.08);
+            color: #5f6368;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        
+        .clear-btn:hover {
+            color: var(--text-main);
+            background: rgba(32, 33, 36, 0.08);
+        }
+        
+        .submit-btn {
+            background: var(--primary);
+            border: none;
+            color: #ffffff;
+            border-radius: 12px;
+            height: 42px;
+            padding: 0 18px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: 0.01em;
+        }
+        
+        .submit-btn:hover {
+            background: #1558c0;
+            transform: translateY(-1px);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(26, 115, 232, 0.2);
+        }
+        
+        .kbd-badge {
+            font-family: monospace;
+            font-size: 12px;
+            padding: 2px 5px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            line-height: 1.4;
+        }
+        
+        .quick-grid-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 0 6px;
+        }
+        
+        .quick-grid-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .quick-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 16px 12px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--card-shadow);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quick-card:hover {
+            transform: translateY(-4px);
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            box-shadow: 0 12px 28px -10px rgba(32, 33, 36, 0.16), 0 0 0 1px rgba(26, 115, 232, 0.02);
+        }
+        
+        .quick-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+            transition: transform 0.25s ease;
+        }
+        
+        .quick-card:hover .quick-icon-wrapper {
+            transform: scale(1.06);
+        }
+        
+        .quick-icon-wrapper svg {
+            width: 26px;
+            height: 26px;
+        }
+        
+        .quick-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+        
+        .quick-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        .icon-google {
+            background: linear-gradient(135deg, #ffffff, #edf3fd);
+        }
+        
+        .icon-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+        
+        .icon-youtube {
+            background: linear-gradient(135deg, #FF0000, #B91C1C);
+        }
+        
+        .icon-github {
+            background: linear-gradient(135deg, #24292e, #0d1117);
+        }
+        
+        .icon-chatgpt {
+            background: linear-gradient(135deg, #10a37f, #0d8265);
+        }
+        
+        .icon-wikipedia {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+        
+        .icon-gmail {
+            background: linear-gradient(135deg, #ea4335, #c5221f);
+        }
+        
+        .icon-news {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        
+        .icon-reddit {
+            background: linear-gradient(135deg, #FF4500, #C53200);
+        }
+        
+        .icon-twitter {
+            background: linear-gradient(135deg, #1d9bf0, #0c7abf);
+        }
+        
+        .footer-bar {
+            width: 100%;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: var(--glass-blur);
+            z-index: 1;
+        }
+        
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .footer-item kbd {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 6px;
+            background: rgba(32, 33, 36, 0.05);
+            border: 1px solid rgba(32, 33, 36, 0.08);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #0f9d58;
+            font-weight: 500;
+        }
+        
+        .status-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #0f9d58;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 900px) {
+            .quick-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 650px) {
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .search-box-card {
+                padding: 6px 10px 6px 16px;
+            }
+            .submit-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            .footer-bar {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="site-title" aria-label="Odem Browser">
+            <span class="blue">O</span><span class="red">d</span><span class="yellow">e</span><span class="blue">m</span>
+        </div>
+
+        <div class="search-container">
+            <form class="search-box-card" id="searchForm" onsubmit="handleSearch(event)">
+                <div class="search-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+                <input type="text" id="searchInput" class="search-input" placeholder="Rechercher ou saisir une URL (ex: google.com) ..." autocomplete="off" autofocus />
+                <button type="button" class="clear-btn" id="clearBtn" title="Effacer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span>Rechercher</span>
+                    <span class="kbd-badge">↵</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="quick-grid-header">
+            <span class="quick-grid-title">Raccourcis & Favoris</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Accès rapide</span>
+        </div>
+
+        <div class="quick-grid">
+            <a href="https://www.google.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-google">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                    </svg>
+                </div>
+                <span class="quick-name">Google</span>
+                <span class="quick-desc">Recherche Web</span>
+            </a>
+
+            <a href="https://web.whatsapp.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-whatsapp">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M17.472 14.382c-.301-.15-1.78-.879-2.056-.98-.276-.1-.477-.15-.678.15-.2.301-.778.98-.954 1.18-.175.201-.351.226-.652.075-.301-.15-1.27-.468-2.42-1.493-.894-.798-1.498-1.784-1.674-2.085-.175-.301-.019-.464.132-.614.135-.135.301-.351.451-.527.151-.175.201-.301.301-.502.1-.2.05-.376-.025-.527-.075-.15-.678-1.635-.929-2.238-.244-.588-.492-.508-.678-.518-.175-.01-.376-.01-.577-.01-.201 0-.527.075-.803.376-.276.301-1.054 1.03-1.054 2.511 0 1.481 1.08 2.91 1.23 3.111.15.201 2.125 3.245 5.148 4.552.719.311 1.28.497 1.718.636.722.23 1.378.197 1.898.12.58-.088 1.78-.728 2.03-1.431.25-.703.25-1.306.175-1.431-.075-.125-.276-.201-.577-.351zm-5.462 7.618h-.008a9.92 9.92 0 0 1-5.06-1.39l-.363-.216-3.763.987 1.004-3.668-.236-.376a9.914 9.914 0 0 1-1.52-5.327c0-5.484 4.463-9.947 9.952-9.947a9.907 9.907 0 0 1 7.03 2.913 9.897 9.897 0 0 1 2.913 7.034c0 5.485-4.463 9.95-9.949 9.95z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">WhatsApp</span>
+                <span class="quick-desc">Messagerie</span>
+            </a>
+
+            <a href="https://www.youtube.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-youtube">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">YouTube</span>
+                <span class="quick-desc">Vidéos & Musique</span>
+            </a>
+
+            <a href="https://github.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-github">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">GitHub</span>
+                <span class="quick-desc">Code & Projets</span>
+            </a>
+
+            <a href="https://chatgpt.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-chatgpt">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M22.28 9.87a6.2 6.2 0 0 0-.52-5.18 6.3 6.3 0 0 0-6.72-2.93 6.24 6.24 0 0 0-4.63-2.07 6.29 6.29 0 0 0-6 4.39 6.22 6.22 0 0 0-4.04 2.94 6.28 6.28 0 0 0 .73 7.34 6.2 6.2 0 0 0 .52 5.18 6.3 6.3 0 0 0 6.72 2.93 6.24 6.24 0 0 0 4.63 2.07 6.29 6.29 0 0 0 6-4.39 6.22 6.22 0 0 0 4.04-2.94 6.28 6.28 0 0 0-.73-7.34z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">ChatGPT</span>
+                <span class="quick-desc">Intelligence Artificielle</span>
+            </a>
+
+            <a href="https://fr.wikipedia.org" class="quick-card">
+                <div class="quick-icon-wrapper icon-wikipedia">
+                    <svg viewBox="0 0 24 24" fill="#1e293b">
+                        <path d="M12.09 13.92l2.36-6.65h1.92l-3.32 8.78h-1.92l-2.08-5.6-2.06 5.6H5.07L1.75 7.27h1.92l2.36 6.65 1.7-4.88h1.7l1.7 4.88h.96zm4.94-6.65h1.76l4.21 11.23h-1.85l-.94-2.58h-4.63l-.94 2.58h-1.82l4.21-11.23zm-.96 7.15h3.69l-1.84-5.07-1.85 5.07z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">Wikipédia</span>
+                <span class="quick-desc">Encyclopédie Libre</span>
+            </a>
+
+            <a href="https://mail.google.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-gmail">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.272H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.49l8.073-5.997C21.69 2.28 24 3.434 24 5.457z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">Gmail</span>
+                <span class="quick-desc">Boîte de Réception</span>
+            </a>
+
+            <a href="https://www.lemonde.fr" class="quick-card">
+                <div class="quick-icon-wrapper icon-news">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">Actualités</span>
+                <span class="quick-desc">Le Monde & Infos</span>
+            </a>
+
+            <a href="https://www.reddit.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-reddit">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.609a1.24 1.24 0 0 1 1.108-.693zM8.617 12.333c-.707 0-1.28.574-1.28 1.281 0 .707.573 1.28 1.28 1.28.707 0 1.281-.573 1.281-1.28 0-.707-.574-1.281-1.281-1.281zm6.766 0c-.707 0-1.28.574-1.28 1.281 0 .707.573 1.28 1.28 1.28.707 0 1.281-.573 1.281-1.28 0-.707-.574-1.281-1.281-1.281zm-3.383 3.513c-.886 0-1.572.336-1.954.673a.35.35 0 0 0 .238.61.343.343 0 0 0 .239-.089c.307-.265.845-.515 1.477-.515.632 0 1.17.25 1.477.515a.348.348 0 0 0 .477-.521c-.382-.337-1.068-.673-1.954-.673z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">Reddit</span>
+                <span class="quick-desc">Communautés</span>
+            </a>
+
+            <a href="https://x.com" class="quick-card">
+                <div class="quick-icon-wrapper icon-twitter">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </div>
+                <span class="quick-name">X (Twitter)</span>
+                <span class="quick-desc">Réseau Social</span>
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer-bar">
+        <div class="footer-left">
+            <span class="status-badge">
+                <span class="status-badge-dot"></span> Odem Web Engine Actif
+            </span>
+            <div class="footer-item">
+                <kbd>/</kbd> ou <kbd>Ctrl+L</kbd> Focus recherche
+            </div>
+            <div class="footer-item">
+                <kbd>Entrée</kbd> Naviguer
+            </div>
+        </div>
+        <div>
+            Odem Browser • Confidentialité & Vitesse
+        </div>
+    </footer>
+
+    <script>
+        let activeEngine = 'google';
+        const engineTabs = document.querySelectorAll('.engine-tab');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+
+        engineTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                engineTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeEngine = tab.dataset.engine;
+                searchInput.focus();
+            });
+        });
+
+        searchInput.addEventListener('input', () => {
+            clearBtn.style.display = searchInput.value ? 'flex' : 'none';
+        });
+
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            searchInput.focus();
+        });
+
+        function handleSearch(e) {
+            e.preventDefault();
+            let query = searchInput.value.trim();
+            if (!query) return;
+
+            const hasProtocol = /^https?:\/\//i.test(query);
+            const isLocalhost = /^localhost(:\d+)?/i.test(query);
+            const isIpAddress = /^(\d{1,3}\.){3}\d{1,3}(:\d+)?/i.test(query);
+            const looksLikeDomain = /^[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\/.*)?$/i.test(query);
+
+            if (hasProtocol) {
+                window.location.href = query;
+                return;
+            }
+
+            if (isLocalhost || isIpAddress || looksLikeDomain) {
+                window.location.href = 'https://' + query;
+                return;
+            }
+
+            let targetUrl = '';
+            const encoded = encodeURIComponent(query);
+            switch (activeEngine) {
+                case 'duckduckgo':
+                    targetUrl = `https://duckduckgo.com/?q=${encoded}`;
+                    break;
+                case 'youtube':
+                    targetUrl = `https://www.youtube.com/results?search_query=${encoded}`;
+                    break;
+                case 'bing':
+                    targetUrl = `https://www.bing.com/search?q=${encoded}`;
+                    break;
+                case 'google':
+                default:
+                    targetUrl = `https://www.google.com/search?q=${encoded}`;
+                    break;
+            }
+
+            window.location.href = targetUrl;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
+    </script>
+</body>
+
+</html>

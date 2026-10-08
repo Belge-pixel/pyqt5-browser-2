@@ -1,0 +1,19 @@
+<RCC>
+  <qresource prefix="images">
+    <file>assets/minus-small.png</file>
+    <file>assets/square.png</file>
+    <file>assets/cross.png</file>
+    <file>assets/search(1).png</file>
+    <file>assets/search.png</file>
+    <file>assets/arrow-small-left.png</file>
+    <file>assets/refresh.png</file>
+    <file>assets/arrow-small-right.png</file>
+    <file>assets/arrow_back.png</file>
+    <file>assets/back3.jpeg</file>
+    <file>assets/back2.jpeg</file>
+    <file>assets/back1.jpeg</file>
+    <file>assets/back3.jpeg</file>
+    <file>assets/back2.jpeg</file>
+    <file>assets/back1.jpeg</file>
+  </qresource>
+</RCC>
