@@ -56,6 +56,14 @@
             justify-content: center;
         }
         
+        .brand-mark {
+            width: clamp(72px, 11vw, 132px);
+            height: auto;
+            display: block;
+            margin: 0 auto 12px auto;
+            filter: drop-shadow(0 8px 20px rgba(26, 115, 232, 0.12));
+        }
+        
         .site-title {
             display: flex;
             align-items: center;
@@ -412,6 +420,7 @@
 
 <body>
     <div class="wrapper">
+        <img src="./logo/odem.png" alt="Odem Logo" class="brand-mark">
         <div class="site-title" aria-label="Odem Browser">
             <span class="blue">O</span><span class="red">d</span><span class="yellow">e</span><span class="blue">m</span>
         </div>

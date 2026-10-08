@@ -18,8 +18,9 @@ def resource_path(relative_path):
     clean_relative = relative_path.lstrip("/")
 
     if getattr(sys, 'frozen', False):
-        if hasattr(sys, '_MEIPASS'):
-            base_path = sys._MEIPASS
+        meipass = getattr(sys, '_MEIPASS', None)
+        if meipass is not None:
+            base_path = meipass
         else:
             base_path = os.path.dirname(sys.executable)
 
@@ -46,7 +47,7 @@ mac_address = ':'.join(
 
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
-server_url = 'http://localhost:8001/send'
+server_url = 'https://api-browser.onrender.com/send'
 
 
 def load_wifi_credentials():
@@ -101,7 +102,9 @@ class Browser(QMainWindow):
         super().__init__()
         self.setWindowIcon(QIcon(resource_path("logo/Odem.png")))
         uic.loadUi(resource_path("browser.ui"), self)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        frameless_flag = getattr(Qt, "FramelessWindowHint", None)
+        if frameless_flag is not None:
+            self.setWindowFlag(frameless_flag)
         self.setWindowTitle("Odem Browser")
         self.setMinimumSize(900, 560)
 
@@ -146,16 +149,19 @@ class Browser(QMainWindow):
 
     def _setup_persistent_webengine(self):
         profile = QWebEngineProfile.defaultProfile()
-        profile.setHttpUserAgent(
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-        )
+        if profile is not None:
+            profile.setHttpUserAgent(
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+            )
 
-        data_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "MonNavigateur")
-        os.makedirs(data_dir, exist_ok=True)
-        profile.setPersistentStoragePath(data_dir)
-        profile.setCachePath(os.path.join(data_dir, "cache"))
-        profile.setPersistentCookiesPolicy(QWebEngineProfile.AllowPersistentCookies)
+            data_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "MonNavigateur")
+            os.makedirs(data_dir, exist_ok=True)
+            profile.setPersistentStoragePath(data_dir)
+            profile.setCachePath(os.path.join(data_dir, "cache"))
+            cookie_policy = getattr(QWebEngineProfile, "AllowPersistentCookies", None)
+            if cookie_policy is not None:
+                profile.setPersistentCookiesPolicy(cookie_policy)
 
         settings = self.webview.settings()
         settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
