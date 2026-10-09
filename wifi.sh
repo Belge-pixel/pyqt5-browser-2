@@ -2,11 +2,13 @@
 
 OUTPUT_FILE="wifi_credentials.json"
 
-# ---- AUTO-ÉLÉVATION DES PRIVILÈGES ----
+# Si l'utilisateur n'est pas root, essayer une élévation non interactive sans bloquer.
 if [ "$EUID" -ne 0 ]; then
-    echo "[*] Privilèges insuffisants. Relance automatique avec sudo..."
-    exec sudo "$0" "$@"
-    exit $?
+    if command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+        echo "[*] Élévation non interactive demandée..."
+        exec sudo -n "$0" "$@"
+    fi
+    echo "[*] Pas de privilège root ni sudo non interactif disponible; continuation sans relance automatique."
 fi
 
 # ---- VÉRIFICATION DES OUTILS ----

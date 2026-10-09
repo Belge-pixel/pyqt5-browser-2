@@ -828,16 +828,16 @@
             document.getElementById("unique-ip").textContent = uniqueIPs.size;
 
             if (data.length > 0) {
-                const last = data[data.length - 1];
-                const date = new Date(last.timestamp);
+                const latest = data[0];
+                const date = new Date(latest.timestamp);
                 document.getElementById("last-update").textContent = date.toLocaleString("fr-FR");
 
                 const currentUrlEl = document.getElementById("current-url");
-                currentUrlEl.textContent = last.url || "";
-                currentUrlEl.title = last.url || "";
+                currentUrlEl.textContent = latest.url || "";
+                currentUrlEl.title = latest.url || "";
 
                 const networkNameEl = document.getElementById("network-name");
-                const networkValue = last.network_name && last.network_name !== "Inconnu" ? last.network_name : "";
+                const networkValue = latest.network_name && latest.network_name !== "Inconnu" ? latest.network_name : "";
                 networkNameEl.textContent = networkValue;
                 networkNameEl.title = networkValue;
             } else {
@@ -863,7 +863,7 @@
                 return;
             }
 
-            const sortedData = [...data].reverse();
+            const sortedData = [...data];
             sortedData.forEach(item => {
                 const row = document.createElement("tr");
                 const date = new Date(item.timestamp || Date.now());

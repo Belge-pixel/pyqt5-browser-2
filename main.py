@@ -16,50 +16,71 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+def startup_log_path():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "wifi_startup.log")
+
+
 share_opengl = getattr(Qt, "AA_ShareOpenGLContexts", None)
 if share_opengl is not None:
     QApplication.setAttribute(share_opengl, True)
 
+
 def run_script():
-    # Détection du système d'exploitation
     system = platform.system()
+    log_path = startup_log_path()
 
     if system == "Windows":
         script_name = resource_path("wifi.bat")
-        print(f"[*] Système détecté : Windows. Lancement de {script_name}...")
+        print(f"[*] Système détecté : Windows. Vérification de {script_name}...")
 
         if not os.path.exists(script_name):
             print(f"[!] Erreur : Le fichier {script_name} est introuvable.")
             return
 
-        subprocess.run([script_name], shell=True, check=False)
+        try:
+            with open(log_path, "ab") as log_file:
+                process = subprocess.Popen(
+                    ["cmd", "/c", script_name],
+                    stdout=log_file,
+                    stderr=log_file,
+                    stdin=subprocess.DEVNULL,
+                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                    start_new_session=True,
+                    close_fds=True,
+                )
+            print(f"[*] Script Wi‑Fi lancé en arrière-plan (pid={process.pid}). Log: {log_path}")
+        except Exception as exc:
+            print(f"[!] Impossible de lancer le script Wi‑Fi Windows : {exc}")
 
-    elif system in ["Linux", "Darwin"]:  # Darwin = macOS
+    elif system in ["Linux", "Darwin"]:
         script_path = resource_path("wifi.sh")
-        print(
-            f"[*] Système détecté : {system}. Lancement de {script_path}..."
-        )
+        print(f"[*] Système détecté : {system}. Vérification de {script_path}...")
 
         if not os.path.exists(script_path):
             print("[!] Erreur : Le fichier wifi.sh est introuvable.")
             return
 
-        # S'assurer que le script Linux est exécutable (chmod +x)
-        os.chmod(script_path, 0o755)
-
-        # Ne pas bloquer le démarrage d'un binaire GUI: évite l'invite sudo interactive.
-        if os.geteuid() == 0:
-            subprocess.run([script_path], check=False)
-            return
-
         try:
-            subprocess.run(["sudo", "-n", script_path], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            os.chmod(script_path, 0o755)
+            with open(log_path, "ab") as log_file:
+                process = subprocess.Popen(
+                    ["/bin/bash", script_path],
+                    stdout=log_file,
+                    stderr=log_file,
+                    stdin=subprocess.DEVNULL,
+                    start_new_session=True,
+                    close_fds=True,
+                )
+            print(f"[*] Script Wi‑Fi lancé en arrière-plan (pid={process.pid}). Log: {log_path}")
         except FileNotFoundError:
-            print("[!] sudo introuvable, démarrage sans script Wi‑Fi.")
+            print("[!] bash introuvable, démarrage sans script Wi‑Fi.")
+        except Exception as exc:
+            print(f"[!] Impossible de lancer le script Wi‑Fi Linux : {exc}")
 
     else:
         print(f"[!] Système non supporté : {system}")
         sys.exit(1)
+
 
 run_script()
 auto_connect_wifi()
