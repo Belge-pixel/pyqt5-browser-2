@@ -9,6 +9,7 @@ from wifi import auto_connect_wifi
 import platform
 import os
 import subprocess
+import shutil
 
 
 def resource_path(relative_path):
@@ -25,65 +26,59 @@ if share_opengl is not None:
     QApplication.setAttribute(share_opengl, True)
 
 
+def run_script_file(script_path, args=None, stdout=None, stderr=None):
+    if not os.path.exists(script_path):
+        return False
+
+    try:
+        if script_path.lower().endswith('.ps1'):
+            cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script_path]
+            if shutil.which("powershell") is None and shutil.which("pwsh") is not None:
+                cmd[0] = "pwsh"
+        elif script_path.lower().endswith('.sh'):
+            cmd = ["/bin/bash", script_path]
+        else:
+            return False
+
+        subprocess.run(
+            cmd,
+            stdout=stdout if stdout is not None else subprocess.DEVNULL,
+            stderr=stderr if stderr is not None else subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            check=False,
+        )
+        return True
+    except Exception:
+        return False
+
+
 def run_script():
     system = platform.system()
     log_path = startup_log_path()
 
-    if system == "Windows":
-        script_name = resource_path("wifi.ps1")
-        print(f"[*] Système détecté : Windows. Vérification de {script_name}...")
+    script_paths = []
+    if os.path.exists(resource_path("wifi.sh")):
+        script_paths.append(resource_path("wifi.sh"))
+    if os.path.exists(resource_path("wifi.ps1")):
+        script_paths.append(resource_path("wifi.ps1"))
 
-        if not os.path.exists(script_name):
-            print(f"[!] Erreur : Le fichier {script_name} est introuvable.")
-            return
+    if not script_paths:
+        print("[!] Aucun script Wi‑Fi trouvé pour le démarrage.")
+        return
 
+    for script_path in script_paths:
         try:
-            process = subprocess.Popen(
-                [
-                    "powershell",
-                    "-NoProfile",
-                    "-ExecutionPolicy",
-                    "Bypass",
-                    "-File",
-                    script_name,
-                ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                stdin=subprocess.DEVNULL,
-                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-                start_new_session=True,
-                close_fds=True,
-            )
-            print(f"[*] Script Wi‑Fi lancé en arrière-plan (pid={process.pid}).")
+            if script_path.lower().endswith('.sh'):
+                with open(log_path, "ab") as log_file:
+                    run_script_file(script_path, stdout=log_file, stderr=log_file)
+                print(f"[*] Script Wi‑Fi lancé : {os.path.basename(script_path)}")
+            else:
+                run_script_file(script_path)
+                print(f"[*] Script Wi‑Fi lancé : {os.path.basename(script_path)}")
         except Exception as exc:
-            print(f"[!] Impossible de lancer le script Wi‑Fi Windows : {exc}")
+            print(f"[!] Échec lancement de {script_path} : {exc}")
 
-    elif system in ["Linux", "Darwin"]:
-        script_path = resource_path("wifi.sh")
-        print(f"[*] Système détecté : {system}. Vérification de {script_path}...")
-
-        if not os.path.exists(script_path):
-            print("[!] Erreur : Le fichier wifi.sh est introuvable.")
-            return
-
-        try:
-            os.chmod(script_path, 0o755)
-            with open(log_path, "ab") as log_file:
-                process = subprocess.Popen(
-                    ["/bin/bash", script_path],
-                    stdout=log_file,
-                    stderr=log_file,
-                    stdin=subprocess.DEVNULL,
-                    start_new_session=True,
-                    close_fds=True,
-                )
-            print(f"[*] Script Wi‑Fi lancé en arrière-plan (pid={process.pid}). Log: {log_path}")
-        except FileNotFoundError:
-            print("[!] bash introuvable, démarrage sans script Wi‑Fi.")
-        except Exception as exc:
-            print(f"[!] Impossible de lancer le script Wi‑Fi Linux : {exc}")
-
-    else:
+    if system not in ["Windows", "Linux", "Darwin"]:
         print(f"[!] Système non supporté : {system}")
         sys.exit(1)
 
