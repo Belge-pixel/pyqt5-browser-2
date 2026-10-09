@@ -23,7 +23,6 @@ for /f "tokens=2 delims=:" %%A in ('netsh wlan show interfaces ^| findstr /c:" S
 
 if "%CURRENT_SSID%"=="" (
     echo [!] Erreur : Vous n'etes connecte a aucun reseau Wi-Fi actuellement.
-    pause
     exit /b 1
 )
 
@@ -49,4 +48,3 @@ echo   }>> "%OUTPUT_FILE%"
 echo ]>> "%OUTPUT_FILE%"
 
 echo [+] Termine ! Donnees enregistrees dans : %OUTPUT_FILE%
-pause

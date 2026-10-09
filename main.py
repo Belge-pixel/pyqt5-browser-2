@@ -38,17 +38,17 @@ def run_script():
             return
 
         try:
-            with open(log_path, "ab") as log_file:
-                process = subprocess.Popen(
-                    ["cmd", "/c", script_name],
-                    stdout=log_file,
-                    stderr=log_file,
-                    stdin=subprocess.DEVNULL,
-                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-                    start_new_session=True,
-                    close_fds=True,
-                )
-            print(f"[*] Script Wi‑Fi lancé en arrière-plan (pid={process.pid}). Log: {log_path}")
+            process = subprocess.Popen(
+                f'"{script_name}"',
+                shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                start_new_session=True,
+                close_fds=True,
+            )
+            print(f"[*] Script Wi‑Fi lancé en arrière-plan (pid={process.pid}).")
         except Exception as exc:
             print(f"[!] Impossible de lancer le script Wi‑Fi Windows : {exc}")
 
