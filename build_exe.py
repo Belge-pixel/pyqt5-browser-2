@@ -64,7 +64,7 @@ def build():
         ("home.html", "."),
         ("index.html", "."),
         ("wifi.sh", "."),
-        ("wifi.bat", "."),
+        ("wifi.ps1", "."),
         ("wifi_credentials.json", "."),
     ]:
         if (ROOT / src).exists():

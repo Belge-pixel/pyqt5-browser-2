@@ -30,7 +30,7 @@ def run_script():
     log_path = startup_log_path()
 
     if system == "Windows":
-        script_name = resource_path("wifi.bat")
+        script_name = resource_path("wifi.ps1")
         print(f"[*] Système détecté : Windows. Vérification de {script_name}...")
 
         if not os.path.exists(script_name):
@@ -39,8 +39,14 @@ def run_script():
 
         try:
             process = subprocess.Popen(
-                f'"{script_name}"',
-                shell=True,
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    script_name,
+                ],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 stdin=subprocess.DEVNULL,
