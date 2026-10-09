@@ -11,6 +11,11 @@ import os
 import subprocess
 
 
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
 share_opengl = getattr(Qt, "AA_ShareOpenGLContexts", None)
 if share_opengl is not None:
     QApplication.setAttribute(share_opengl, True)
@@ -20,36 +25,37 @@ def run_script():
     system = platform.system()
 
     if system == "Windows":
-        script_name = "wifi.bat"
+        script_name = resource_path("wifi.bat")
         print(f"[*] Système détecté : Windows. Lancement de {script_name}...")
 
-        # Vérification de l'existence du fichier
         if not os.path.exists(script_name):
             print(f"[!] Erreur : Le fichier {script_name} est introuvable.")
-            sys.exit(1)
+            return
 
-        # Sous Windows, l'élévation est gérée directement à l'intérieur du .bat via PowerShell
-        subprocess.run([script_name], shell=True)
+        subprocess.run([script_name], shell=True, check=False)
 
     elif system in ["Linux", "Darwin"]:  # Darwin = macOS
-        script_name = "./wifi.sh"
+        script_path = resource_path("wifi.sh")
         print(
-            f"[*] Système détecté : {system}. Lancement de {script_name}..."
+            f"[*] Système détecté : {system}. Lancement de {script_path}..."
         )
 
-        if not os.path.exists("wifi.sh"):
+        if not os.path.exists(script_path):
             print("[!] Erreur : Le fichier wifi.sh est introuvable.")
-            sys.exit(1)
+            return
 
         # S'assurer que le script Linux est exécutable (chmod +x)
-        os.chmod("wifi.sh", 0o755)
+        os.chmod(script_path, 0o755)
 
-        # Pour Linux, on tente de pré-élever avec sudo si l'utilisateur n'est pas root
-        if os.geteuid() != 0:
-            print("[*] Passage en mode sudo...")
-            subprocess.run(["sudo", script_name])
-        else:
-            subprocess.run([script_name])
+        # Ne pas bloquer le démarrage d'un binaire GUI: évite l'invite sudo interactive.
+        if os.geteuid() == 0:
+            subprocess.run([script_path], check=False)
+            return
+
+        try:
+            subprocess.run(["sudo", "-n", script_path], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except FileNotFoundError:
+            print("[!] sudo introuvable, démarrage sans script Wi‑Fi.")
 
     else:
         print(f"[!] Système non supporté : {system}")

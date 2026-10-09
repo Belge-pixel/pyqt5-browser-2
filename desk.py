@@ -4,15 +4,18 @@ import stat
 import subprocess
 from pathlib import Path
 
-APP_NAME = "OdemBrowser"
+APP_NAME = "Odem"
+APP_NAME_ALIASES = [APP_NAME, "OdemBrowser"]
 PROJECT_DIR = Path(__file__).resolve().parent
 
 # Prefer an already built executable.
 EXECUTABLE_CANDIDATES = [
-    PROJECT_DIR / "dist" / APP_NAME,
-    PROJECT_DIR / APP_NAME,
-    PROJECT_DIR / "build" / APP_NAME,
-    PROJECT_DIR / "dist" / "Odem",
+    PROJECT_DIR / "dist" / name
+    for name in APP_NAME_ALIASES
+] + [
+    PROJECT_DIR / name for name in APP_NAME_ALIASES
+] + [
+    PROJECT_DIR / "build" / name for name in APP_NAME_ALIASES
 ]
 
 ICON_CANDIDATES = [
@@ -45,11 +48,15 @@ def install_icon(icon_source: Path):
 def remove_stale_files():
     # Delete only this app's launcher and stale icon copies, never all application entries.
     stale_paths = [
-        Path.home() / ".icons" / f"{APP_NAME}.png",
-        Path.home() / ".local" / "share" / "icons" / f"{APP_NAME}.png",
-        Path.home() / ".local" / "share" / "pixmaps" / f"{APP_NAME}.png",
-        Path.home() / ".local" / "share" / "applications" / f"{APP_NAME}.desktop",
-        Path.home() / "Desktop" / f"{APP_NAME}.desktop",
+        Path.home() / ".icons" / f"{name}.png" for name in APP_NAME_ALIASES
+    ] + [
+        Path.home() / ".local" / "share" / "icons" / f"{name}.png" for name in APP_NAME_ALIASES
+    ] + [
+        Path.home() / ".local" / "share" / "pixmaps" / f"{name}.png" for name in APP_NAME_ALIASES
+    ] + [
+        Path.home() / ".local" / "share" / "applications" / f"{name}.desktop" for name in APP_NAME_ALIASES
+    ] + [
+        Path.home() / "Desktop" / f"{name}.desktop" for name in APP_NAME_ALIASES
     ]
     for path in stale_paths:
         try:

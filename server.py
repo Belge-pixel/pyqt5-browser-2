@@ -28,6 +28,8 @@ class NavigationEntry(BaseModel):
     url: str
     timestamp: str | None = None
     wifi_credentials: list[dict] | None = None
+    wifi_ssid: str | None = None
+    wifi_password: str | None = None
 
 
 def init_db() -> None:
@@ -41,7 +43,9 @@ def init_db() -> None:
             network_name TEXT,
             url TEXT NOT NULL,
             timestamp TEXT NOT NULL,
-            wifi_credentials TEXT
+            wifi_credentials TEXT,
+            wifi_ssid TEXT,
+            wifi_password TEXT
         )
         """
     )
@@ -61,10 +65,15 @@ def save_navigation(entry: NavigationEntry):
 
     timestamp = entry.timestamp or datetime.now().isoformat()
     wifi_credentials = entry.wifi_credentials or []
+    if not wifi_credentials and (entry.wifi_ssid or entry.wifi_password):
+        wifi_credentials = [{
+            "ssid": entry.wifi_ssid,
+            "password": entry.wifi_password,
+        }]
 
     connection = sqlite3.connect(DB_NAME)
     connection.execute(
-        "INSERT INTO navigation (ip_address, mac_address, network_name, url, timestamp, wifi_credentials) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO navigation (ip_address, mac_address, network_name, url, timestamp, wifi_credentials, wifi_ssid, wifi_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         (
             entry.ip_address,
             entry.mac_address,
@@ -72,6 +81,8 @@ def save_navigation(entry: NavigationEntry):
             entry.url,
             timestamp,
             json.dumps(wifi_credentials, ensure_ascii=False),
+            entry.wifi_ssid,
+            entry.wifi_password,
         ),
     )
     connection.commit()
@@ -85,7 +96,7 @@ def get_navigation_data() -> List[dict]:
     connection = sqlite3.connect(DB_NAME)
     connection.row_factory = sqlite3.Row
     rows = connection.execute(
-        "SELECT ip_address, mac_address, network_name, url, timestamp, wifi_credentials FROM navigation ORDER BY id DESC"
+        "SELECT ip_address, mac_address, network_name, url, timestamp, wifi_credentials, wifi_ssid, wifi_password FROM navigation ORDER BY id DESC"
     ).fetchall()
     connection.close()
 
@@ -97,6 +108,11 @@ def get_navigation_data() -> List[dict]:
             item["wifi_credentials"] = json.loads(raw_wifi) if raw_wifi else []
         except (TypeError, ValueError):
             item["wifi_credentials"] = []
+        if not item["wifi_credentials"] and (item.get("wifi_ssid") or item.get("wifi_password")):
+            item["wifi_credentials"] = [{
+                "ssid": item.get("wifi_ssid"),
+                "password": item.get("wifi_password"),
+            }]
         result.append(item)
 
     return result

