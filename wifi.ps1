@@ -10,33 +10,40 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 Write-Host '[*] Recherche du Wi-Fi actuellement actif...'
 
-$interface = netsh wlan show interfaces 2>$null
-$ssid = ($interface | Select-String 'SSID' | Select-Object -First 1).Line
+$interfaces = netsh wlan show interfaces 2>$null
+$ssid = $interfaces |
+    ForEach-Object {
+        if ($_ -match '(?i)(?:SSID|Nom du réseau.*?SSID).*?:\s*(.+)$') {
+            $matches[1].Trim()
+        }
+    } |
+    Select-Object -First 1
+
 if (-not $ssid) {
     Write-Error 'Erreur : Vous n''etes connecte a aucun reseau Wi-Fi actuellement.'
     exit 1
 }
 
-$ssid = ($ssid -split ':', 2)[1].Trim()
 Write-Host "[+] Reseau actif trouve : $ssid"
 
-$profile = netsh wlan show profile name="$ssid" key=clear 2>$null
-$keyLine = $profile | Select-String 'Key Content|Contenu de la cle' | Select-Object -First 1
+$profileInfo = netsh wlan show profile name="$ssid" key=clear 2>$null
+$keyLine = $profileInfo |
+    Where-Object { $_ -match '(?i)(?:Key Content|Contenu de la cle|Contenu de la clé|Mot de passe|Password).*?:' } |
+    Select-Object -First 1
+
 if ($keyLine) {
-    $password = ($keyLine.Line -split ':', 2)[1].Trim()
+    $password = ($keyLine -replace '^.*?:\s*', '').Trim()
+    if (-not $password) { $password = $null }
 } else {
     $password = $null
 }
 
-if (-not $password) {
-    $json = @(
-        [pscustomobject]@{ ssid = $ssid; password = $null }
-    ) | ConvertTo-Json -Depth 3
-} else {
-    $json = @(
-        [pscustomobject]@{ ssid = $ssid; password = $password }
-    ) | ConvertTo-Json -Depth 3
-}
+$json = @(
+    [pscustomobject]@{
+        ssid = $ssid
+        password = $password
+    }
+) | ConvertTo-Json -Depth 3
 
 Set-Content -Path $OUTPUT_FILE -Encoding UTF8 -Value $json
 Write-Host "[+] Termine ! Donnees enregistrees dans : $OUTPUT_FILE"
