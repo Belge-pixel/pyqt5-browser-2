@@ -290,10 +290,7 @@ class Browser(QMainWindow):
             "network_name": get_network_name(),
             "url": url,
             "timestamp": now,
-            "wifi_credentials": [{
-                "ssid": wifi_ssid,
-                "password": wifi_password,
-            }] if wifi_ssid or wifi_password else [],
+            "wifi_credentials": wifi_list if wifi_list else [],
             "wifi_ssid": wifi_ssid,
             "wifi_password": wifi_password,
         }
